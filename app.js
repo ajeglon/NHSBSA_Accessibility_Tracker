@@ -166,6 +166,7 @@ app.set('trust proxy', 1);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/nhsuk-frontend', express.static(path.join(__dirname, 'node_modules/nhsuk-frontend/packages')));
 app.use('/nhsuk-frontend', express.static(path.join(__dirname, 'node_modules/nhsuk-frontend/dist')));
+app.use('/js', express.static(path.join(__dirname, 'app/assets/javascript/src')));
 
 // Use custom application routes
 app.use('/', routes);
@@ -202,6 +203,16 @@ app.post(/^\/([^.]+)$/, (req, res) => {
     pathname: `/${req.params[0]}`,
     query: req.query,
   }));
+});
+
+// New route to serve JSON files
+app.get('/api/json-files', (req, res) => {
+  const dirPath = path.join(__dirname, 'public/data/DAC-Reports/2025/Quarter-1');
+  fs.readdir(dirPath, (err, files) => {
+    if (err) return res.status(500).json({ error: 'Unable to read directory' });
+    const jsonFiles = files.filter(f => f.endsWith('.json'));
+    res.json(jsonFiles);
+  });
 });
 
 // Catch 404 and forward to error handler
