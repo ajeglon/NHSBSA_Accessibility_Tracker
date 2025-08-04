@@ -167,6 +167,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/nhsuk-frontend', express.static(path.join(__dirname, 'node_modules/nhsuk-frontend/packages')));
 app.use('/nhsuk-frontend', express.static(path.join(__dirname, 'node_modules/nhsuk-frontend/dist')));
 app.use('/js', express.static(path.join(__dirname, 'app/assets/javascript/src')));
+app.use('/data/DAC-Reports/2025/Quarter-1', express.static(path.join(__dirname, 'app/data/DAC-Reports/2025/Quarter-1')));
 
 // Use custom application routes
 app.use('/', routes);
@@ -207,7 +208,7 @@ app.post(/^\/([^.]+)$/, (req, res) => {
 
 // New route to serve JSON files
 app.get('/api/json-files', (req, res) => {
-  const dirPath = path.join(__dirname, 'public/data/DAC-Reports/2025/Quarter-1');
+  const dirPath = path.join(__dirname, 'app/data/DAC-Reports/2025/Quarter-1');
   fs.readdir(dirPath, (err, files) => {
     if (err) return res.status(500).json({ error: 'Unable to read directory' });
     const jsonFiles = files.filter(f => f.endsWith('.json'));
