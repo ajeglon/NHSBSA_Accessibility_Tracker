@@ -1,24 +1,7 @@
-{% extends "layout.html" %}
-{% from 'back-link/macro.njk' import backLink %}
-{% from 'button/macro.njk' import button %}
-{% from 'radios/macro.njk' import radios %}
-
-{% set mainClasses = "nhsuk-main-wrapper--s" %}
-
-{% block beforeContent %}
-  {{ backLink({
-    href: "#",
-    text: "Back"
-  }) }}
-{% endblock %}
-
-{% block content %}
-  <div class="nhsuk-grid-row">
-    <div class="nhsuk-grid-column-two-thirds">
-      <h1>
-          Quarter 1, 2025
-      </h1>
-      <canvas id="myChart" width="400" height="200"></canvas>
-    </div>
-  </div>
+{% extends "content-layout.html" %}
+{% set pageHeading = "Quarter 1, 2025" %}
+{% block pageContent %}
+  <canvas id="WCAGFailuresChart" width="400" height="200"></canvas>
+  <br/>
+  <div id="wcag-failures-table"></div>
 {% endblock %}
