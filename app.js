@@ -216,6 +216,14 @@ app.get('/api/json-files', (req, res) => {
   });
 });
 
+// Route to handle WCAG failures
+app.get('/wcag-failures/:slug', (req, res) => {
+  const slug = req.params.slug;
+  // Optionally, you can map slugs to human-readable names or fetch more info from a data source
+  // For now, just render the page with the slug
+  res.render('wcag-failure-detail.html', { slug });
+});
+
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
   const err = new Error(`Page not found: ${req.path}`); // eslint-disable-line no-console

@@ -1,24 +1,4 @@
-{% extends "layout.html" %}
-{% from 'back-link/macro.njk' import backLink %}
-{% from 'button/macro.njk' import button %}
-{% from 'radios/macro.njk' import radios %}
-
-{% set mainClasses = "nhsuk-main-wrapper--s" %}
-
-{% block beforeContent %}
-  {{ backLink({
-    href: "#",
-    text: "Back"
-  }) }}
-{% endblock %}
-
-{% block content %}
-  <div class="nhsuk-grid-row">
-    <div class="nhsuk-grid-column-two-thirds">
-      <h1>
-          Quarter 2, 2025
-      </h1>
-
-    </div>
-  </div>
+{% extends "content-layout.html" %}
+{% set pageHeading = "Quarter 2, 2025" %}
+{% block pageContent %}
 {% endblock %}

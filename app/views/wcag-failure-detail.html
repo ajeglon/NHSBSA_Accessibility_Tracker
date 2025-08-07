@@ -1,0 +1,10 @@
+{% extends "content-layout.html" %}
+{% set pageHeading = "WCAG Failure Detail" %}
+
+{% block pageContent %}
+  <h2>{{ slug | replace("-", " ") | title }}</h2>
+  <p>
+    This is a detail page for the WCAG failure: <strong>{{ slug | replace("-", " ") | upper }}</strong>.
+  </p>
+  <!-- You can add more dynamic content here, such as descriptions, examples, etc. -->
+{% endblock %}

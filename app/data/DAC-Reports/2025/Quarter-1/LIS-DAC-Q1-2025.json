@@ -9,7 +9,8 @@
     ],
     "failed": [
       "1.1.1 Non-text Content",
-      "2.4.2 Page Titled"
+      "2.4.2 Page Titled",
+      "2.4.4 Link Purpose (In Context)"
     ]
   },
   "WCAG_AA": {
@@ -21,7 +22,9 @@
       "1.4.11 Non-text Contrast",
       "1.4.12 Text Spacing"
     ],
-    "failed": []
+    "failed": [
+      "2.4.6 Headings and Labels"
+    ]
   },
   "WCAG_AAA": {
     "passed": [
