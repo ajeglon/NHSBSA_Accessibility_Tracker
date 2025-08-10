@@ -1,7 +1,9 @@
 {% extends "content-layout.html" %}
 {% set pageHeading = "Quarter 1, 2025" %}
+{% set year = "2025" %}
+{% set quarter = "1" %}
 {% block pageContent %}
-  <canvas id="WCAGFailuresChart" width="400" height="200"></canvas>
+  <canvas id="WCAGFailuresChart" width="400" height="200" data-year="{{ year }}" data-quarter="{{ quarter }}"></canvas>
   <br/>
   <div id="wcag-failures-table"></div>
 {% endblock %}

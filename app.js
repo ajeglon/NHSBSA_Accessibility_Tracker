@@ -168,6 +168,14 @@ app.use('/nhsuk-frontend', express.static(path.join(__dirname, 'node_modules/nhs
 app.use('/nhsuk-frontend', express.static(path.join(__dirname, 'node_modules/nhsuk-frontend/dist')));
 app.use('/js', express.static(path.join(__dirname, 'app/assets/javascript/src')));
 app.use('/data/DAC-Reports/2025/Quarter-1', express.static(path.join(__dirname, 'app/data/DAC-Reports/2025/Quarter-1')));
+app.use(
+  '/data/DAC-Reports/2025/Quarter-2',
+  express.static(path.join(__dirname, 'app/data/DAC-Reports/2025/Quarter-2'))
+);
+app.use(
+  '/data/DAC-Reports',
+  express.static(path.join(__dirname, 'app/data/DAC-Reports'))
+);
 
 // Use custom application routes
 app.use('/', routes);
@@ -208,7 +216,11 @@ app.post(/^\/([^.]+)$/, (req, res) => {
 
 // New route to serve JSON files
 app.get('/api/json-files', (req, res) => {
-  const dirPath = path.join(__dirname, 'app/data/DAC-Reports/2025/Quarter-1');
+  const year = req.query.year;
+  const quarter = req.query.quarter;
+  if (!year || !quarter) return res.status(400).json({ error: 'Missing year or quarter' });
+
+  const dirPath = path.join(__dirname, `app/data/DAC-Reports/${year}/Quarter-${quarter}`);
   fs.readdir(dirPath, (err, files) => {
     if (err) return res.status(500).json({ error: 'Unable to read directory' });
     const jsonFiles = files.filter(f => f.endsWith('.json'));
