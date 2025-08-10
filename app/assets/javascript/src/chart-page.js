@@ -1,10 +1,21 @@
 document.addEventListener('DOMContentLoaded', async function () {
-  // Get all JSON filenames from the API
-  const filesResponse = await fetch('/api/json-files');
+  const canvas = document.getElementById('WCAGFailuresChart');
+  if (!canvas) return;
+
+  const year = canvas.getAttribute('data-year');
+  const quarter = canvas.getAttribute('data-quarter');
+
+  // Fetch JSON filenames for this quarter
+  const filesResponse = await fetch(`/api/json-files?year=${year}&quarter=${quarter}`);
   const files = await filesResponse.json();
 
+  if (!Array.isArray(files)) {
+    console.error('API did not return an array:', files);
+    return;
+  }
+
   // Build full URLs for each file
-  const fileUrls = files.map(f => `/data/DAC-Reports/2025/Quarter-1/${f}`);
+  const fileUrls = files.map(f => `/data/DAC-Reports/${year}/Quarter-${quarter}/${f}`);
 
   // Fetch all JSON files
   const responses = await Promise.all(fileUrls.map(url => fetch(url)));
