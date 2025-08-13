@@ -1,10 +1,18 @@
 {% extends "content-layout.html" %}
-{% set pageHeading = "WCAG Failure Detail" %}
+{% from 'details/macro.njk' import details %}
+{% set pageHeading = failure and failure.name or (slug | replace("-", " ") | title) %}
 
 {% block pageContent %}
-  <h2>{{ slug | replace("-", " ") | title }}</h2>
-  <p>
-    This is a detail page for the WCAG failure: <strong>{{ slug | replace("-", " ") | upper }}</strong>.
-  </p>
-  <!-- You can add more dynamic content here, such as descriptions, examples, etc. -->
+  <h2>{{ failure.level }}</h2>
+  {% if failure %}
+    <p>{{ failure.description }}</p>
+    {% if failure.details %}
+      {{ details({
+        text: "Show full WCAG guidance",
+        html: failure.details
+      }) }}
+    {% endif %}
+  {% else %}
+    <p>No description available for this WCAG failure.</p>
+  {% endif %}
 {% endblock %}

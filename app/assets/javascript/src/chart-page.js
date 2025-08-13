@@ -83,11 +83,13 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   // Function to create a URL-friendly slug
   function slugify(text) {
+    // Replace dots with dashes for WCAG numbers, then slugify the rest
     return text
       .toString()
+      .replace(/^(\d+)\.(\d+)\.(\d+)/, '$1-$2-$3') // 1.1.1 -> 1-1-1
       .toLowerCase()
       .replace(/\s+/g, '-')           // Replace spaces with -
-      .replace(/[^\w\-()]+/g, '')     // Remove all non-word chars except ()
+      .replace(/[^\w\-]+/g, '')       // Remove all non-word chars except -
       .replace(/\-\-+/g, '-')         // Replace multiple - with single -
       .replace(/^-+/, '')             // Trim - from start of text
       .replace(/-+$/, '');            // Trim - from end of text
