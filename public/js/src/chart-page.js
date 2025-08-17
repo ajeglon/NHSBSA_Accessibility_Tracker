@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', async function () {
   const canvas = document.getElementById('WCAGFailuresChart');
-  if (!canvas) return;
+  const toggleBtn = document.getElementById('toggle-failures-btn');
+  if (!canvas || !toggleBtn) return;
   const year = canvas.getAttribute('data-year');
   const quarter = canvas.getAttribute('data-quarter');
 
@@ -43,87 +44,111 @@ document.addEventListener('DOMContentLoaded', async function () {
     failureCounts[key] = (failureCounts[key] || 0) + 1;
   });
 
-  // Sort and get top 5 failures
-  const sortedFailures = Object.entries(failureCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  // Function to create a URL-friendly slug
+  function slugify(text) {
+    return text.toString().replace(/^(\d+)\.(\d+)\.(\d+)/, '$1-$2-$3').toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
+  }
 
-  // Prepare chart labels and data for top 5
-  const labels = sortedFailures.map(([key]) => key);
-  const data = sortedFailures.map(([, count]) => count);
-  const colors = labels.map(label => {
-    if (label.includes('(A)')) return 'rgba(23, 104, 17, 0.7)';
-    if (label.includes('(AA)')) return 'rgba(169, 100, 22, 0.7)';
-    return 'rgba(196, 5, 5, 0.7)';
-  });
-
-  // Create the chart
-  const ctx = document.getElementById('WCAGFailuresChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Top 5 WCAG Failures',
-        data: data,
-        backgroundColor: colors,
-        borderColor: colors,
-        borderWidth: 1
-      }]
-    },
-    options: {
-      plugins: {
-        legend: {
-          display: false
-        }
+  // Chart instance variable
+  let chartInstance = null;
+  let showingAll = false;
+  function getSortedFailures(all = false) {
+    const sorted = Object.entries(failureCounts).sort((a, b) => b[1] - a[1]);
+    return all ? sorted : sorted.slice(0, 5);
+  }
+  function getChartData(sortedFailures) {
+    const labels = sortedFailures.map(([key]) => key);
+    const data = sortedFailures.map(([, count]) => count);
+    const colors = labels.map(label => {
+      if (label.includes('(A)')) return 'rgba(23, 104, 17, 0.7)';
+      if (label.includes('(AA)')) return 'rgba(169, 100, 22, 0.7)';
+      return 'rgba(196, 5, 5, 0.7)';
+    });
+    return {
+      labels,
+      data,
+      colors
+    };
+  }
+  function renderChart(sortedFailures) {
+    const {
+      labels,
+      data,
+      colors
+    } = getChartData(sortedFailures);
+    const ctx = canvas.getContext('2d');
+    if (chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: showingAll ? 'All WCAG Failures' : 'Top 5 WCAG Failures',
+          data: data,
+          backgroundColor: colors,
+          borderColor: colors,
+          borderWidth: 1
+        }]
       },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            stepSize: 1
+      options: {
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
           }
         }
       }
-    }
-  });
-
-  // Function to create a URL-friendly slug
-  function slugify(text) {
-    // Replace dots with dashes for WCAG numbers, then slugify the rest
-    return text.toString().replace(/^(\d+)\.(\d+)\.(\d+)/, '$1-$2-$3') // 1.1.1 -> 1-1-1
-    .toLowerCase().replace(/\s+/g, '-') // Replace spaces with -
-    .replace(/[^\w\-]+/g, '') // Remove all non-word chars except -
-    .replace(/\-\-+/g, '-') // Replace multiple - with single -
-    .replace(/^-+/, '') // Trim - from start of text
-    .replace(/-+$/, ''); // Trim - from end of text
+    });
+  }
+  function renderTable(sortedFailures) {
+    const tableDiv = document.getElementById('wcag-failures-table');
+    let tableHtml = `
+      <h2>${showingAll ? 'All WCAG Failures' : 'Top 5 WCAG Failures'}</h2>
+      <table class="nhsuk-table">
+        <thead>
+          <tr>
+            <th>Failure</th>
+            <th>Count</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    sortedFailures.forEach(([key, count]) => {
+      const name = key.replace(/\s*\([^)]+\)$/, '');
+      const slug = slugify(name);
+      tableHtml += `
+        <tr>
+          <td><a href="/wcag-failures/${slug}">${key}</a></td>
+          <td>${count}</td>
+        </tr>
+      `;
+    });
+    tableHtml += `
+        </tbody>
+      </table>
+    `;
+    tableDiv.innerHTML = tableHtml;
+  }
+  function updateView() {
+    const sortedFailures = getSortedFailures(showingAll);
+    renderChart(sortedFailures);
+    renderTable(sortedFailures);
+    toggleBtn.textContent = showingAll ? 'Show top 5 failures' : 'Show all failures';
   }
 
-  // Render the table of top 5 failures
-  const tableDiv = document.getElementById('wcag-failures-table');
-  let tableHtml = `
-    <h2>Top 5 WCAG Failures</h2>
-    <table class="nhsuk-table">
-      <thead>
-        <tr>
-          <th>Failure</th>
-          <th>Count</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-  sortedFailures.forEach(([key, count]) => {
-    // Extract just the failure name (remove the level in parentheses for the link)
-    const name = key.replace(/\s*\([^)]+\)$/, '');
-    const slug = slugify(name);
-    tableHtml += `
-      <tr>
-        <td><a href="/wcag-failures/${slug}">${key}</a></td>
-        <td>${count}</td>
-      </tr>
-    `;
+  // Initial render (top 5)
+  updateView();
+
+  // Toggle on button click
+  toggleBtn.addEventListener('click', function () {
+    showingAll = !showingAll;
+    updateView();
   });
-  tableHtml += `
-      </tbody>
-    </table>
-  `;
-  tableDiv.innerHTML = tableHtml;
 });
