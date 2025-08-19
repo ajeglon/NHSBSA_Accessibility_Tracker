@@ -70,6 +70,13 @@ let nunjucksAppEnv = nunjucks.configure(appViews, nunjucksConfig);
 nunjucksAppEnv.addGlobal('version', packageInfo.version);
 
 // Add Nunjucks filters
+// Add after your Nunjucks environment is created
+const dateFilter = require('nunjucks-date-filter');
+dateFilter.setDefaultFormat('YYYY-MM-DD HH:mm');
+nunjucksAppEnv.addFilter('date', dateFilter);
+nunjucksAppEnv.addFilter('shortDate', function(str) {
+  return str ? str.substring(0, 16).replace('T', ' ') : '';
+});
 utils.addNunjucksFilters(nunjucksAppEnv);
 
 // Session uses service name to avoid clashes with other prototypes
@@ -206,6 +213,20 @@ exampleTemplatesApp.get(/^([^.]+)$/, (req, res, next) => {
 
 app.use('/prototype-admin', prototypeAdminRoutes);
 
+// Handle comments on WCAG failures
+app.post('/wcag-failures/:slug/comment', (req, res) => {
+  const slug = req.params.slug;
+  const text = req.body.WCAGFailureExample;
+  const commentsFile = path.join(__dirname, 'comments.json');
+  let comments = [];
+  if (fs.existsSync(commentsFile)) {
+    comments = JSON.parse(fs.readFileSync(commentsFile));
+  }
+  comments.push({ slug, text, date: new Date().toISOString() });
+  fs.writeFileSync(commentsFile, JSON.stringify(comments, null, 2));
+  res.redirect(`/wcag-failures/${slug}`);
+});
+
 // Redirect all POSTs to GETs - this allows users to use POST for autoStoreData
 app.post(/^\/([^.]+)$/, (req, res) => {
   res.redirect(url.format({
@@ -233,9 +254,17 @@ const wcagFailures = require('./app/assets/javascript/src/wcag-failures.js');
 app.get('/wcag-failures/:slug', (req, res) => {
   const slug = req.params.slug;
   const failure = wcagFailures[slug];
+  const commentsFile = path.join(__dirname, 'comments.json');
+  let comments = [];
+  if (fs.existsSync(commentsFile)) {
+    comments = JSON.parse(fs.readFileSync(commentsFile));
+  }
+  // Only show comments for this slug
+  const filteredComments = comments.filter(c => c.slug === slug);
   res.render('wcag-failure-detail.html', {
+    failure,
     slug,
-    failure
+    comments: filteredComments
   });
 });
 
@@ -252,6 +281,9 @@ app.use((err, req, res) => {
   res.status(err.status || 500);
   res.send(err.message);
 });
+
+// Parse URL-encoded bodies (from HTML forms)
+app.use(express.urlencoded({ extended: false }));
 
 // Run the application
 app.listen(port);
