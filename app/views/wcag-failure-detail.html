@@ -33,7 +33,13 @@
           <li>
             <div class="nhsuk-inset-text">
               <p>{{ comment.text | escape }}</p>
-              <small>Submitted on {{ comment.date | shortDate }}</small>
+              <br>
+              <form method="POST" action="/wcag-failures/{{ slug }}/comment/{{ comment.id }}/delete" style="display:inline;">
+                <button class="nhsuk-button nhsuk-button--secondary" type="submit" style="margin-left:1em;">Delete</button>
+              </form>
+              <form method="GET" action="/wcag-failures/{{ slug }}/comment/{{ comment.id }}/edit" style="display:inline;">
+                <button class="nhsuk-button nhsuk-button--secondary" type="submit" style="margin-left:0.5em;">Edit</button>
+              </form>
             </div>
           </li>
         {% endfor %}

@@ -184,7 +184,79 @@ app.use(
   express.static(path.join(__dirname, 'app/data/DAC-Reports'))
 );
 
-// Use custom application routes
+// --- Place all comment routes here, before auto-routing and routes middleware ---
+
+// Handle comments on WCAG failures
+app.post('/wcag-failures/:slug/comment', (req, res) => {
+  const slug = req.params.slug;
+  const text = req.body.WCAGFailureExample;
+  const commentsFile = path.join(__dirname, 'comments.json');
+  let comments = [];
+  if (fs.existsSync(commentsFile)) {
+    comments = JSON.parse(fs.readFileSync(commentsFile));
+  }
+  // Generate a unique id (timestamp + random)
+  const id = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+  comments.push({ id, slug, text, date: new Date().toISOString() });
+  fs.writeFileSync(commentsFile, JSON.stringify(comments, null, 2));
+  res.redirect(`/wcag-failures/${slug}`);
+});
+
+// Edit comment route
+app.get('/wcag-failures/:slug/comment/:id/edit', (req, res) => {
+  const slug = req.params.slug;
+  const id = req.params.id;
+  const commentsFile = path.join(__dirname, 'comments.json');
+  let comments = [];
+  if (fs.existsSync(commentsFile)) {
+    comments = JSON.parse(fs.readFileSync(commentsFile));
+  }
+  const comment = comments.find(c => c.slug === slug && c.id === id);
+  if (!comment) {
+    return res.redirect(`/wcag-failures/${slug}`);
+  }
+  res.render('wcag-edit-comment.html', {
+    slug,
+    comment,
+    id
+  });
+});
+
+// Update comment route
+app.post('/wcag-failures/:slug/comment/:id/edit', (req, res) => {
+  const slug = req.params.slug;
+  const id = req.params.id;
+  const newText = req.body.editComment;
+  const commentsFile = path.join(__dirname, 'comments.json');
+  let comments = [];
+  if (fs.existsSync(commentsFile)) {
+    comments = JSON.parse(fs.readFileSync(commentsFile));
+  }
+  const comment = comments.find(c => c.slug === slug && c.id === id);
+  if (comment) {
+    comment.text = newText;
+    comment.date = new Date().toISOString();
+    fs.writeFileSync(commentsFile, JSON.stringify(comments, null, 2));
+  }
+  res.redirect(`/wcag-failures/${slug}`); // This returns to the comments page
+});
+
+// Delete comment route
+app.post('/wcag-failures/:slug/comment/:id/delete', (req, res) => {
+  const slug = req.params.slug;
+  const id = req.params.id;
+  const commentsFile = path.join(__dirname, 'comments.json');
+  let comments = [];
+  if (fs.existsSync(commentsFile)) {
+    comments = JSON.parse(fs.readFileSync(commentsFile));
+  }
+  // Remove the comment with matching slug and id
+  comments = comments.filter(c => !(c.slug === slug && c.id === id));
+  fs.writeFileSync(commentsFile, JSON.stringify(comments, null, 2));
+  res.redirect(`/wcag-failures/${slug}`);
+});
+
+// --- THEN your other routes and middleware ---
 app.use('/', routes);
 
 // Automatically route pages
@@ -212,20 +284,6 @@ exampleTemplatesApp.get(/^([^.]+)$/, (req, res, next) => {
 });
 
 app.use('/prototype-admin', prototypeAdminRoutes);
-
-// Handle comments on WCAG failures
-app.post('/wcag-failures/:slug/comment', (req, res) => {
-  const slug = req.params.slug;
-  const text = req.body.WCAGFailureExample;
-  const commentsFile = path.join(__dirname, 'comments.json');
-  let comments = [];
-  if (fs.existsSync(commentsFile)) {
-    comments = JSON.parse(fs.readFileSync(commentsFile));
-  }
-  comments.push({ slug, text, date: new Date().toISOString() });
-  fs.writeFileSync(commentsFile, JSON.stringify(comments, null, 2));
-  res.redirect(`/wcag-failures/${slug}`);
-});
 
 // Redirect all POSTs to GETs - this allows users to use POST for autoStoreData
 app.post(/^\/([^.]+)$/, (req, res) => {
