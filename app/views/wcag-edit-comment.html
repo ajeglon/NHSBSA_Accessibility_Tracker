@@ -1,0 +1,14 @@
+{% extends "content-layout.html" %}
+{% block pageContent %}
+  <h2>Edit Comment</h2>
+  <form method="POST" action="/wcag-failures/{{ slug }}/comment/{{ id }}/edit">
+    <div class="nhsuk-form-group">
+      <label class="nhsuk-label" for="editComment">
+        Edit your comment
+      </label>
+      <textarea class="nhsuk-textarea" id="editComment" name="editComment" rows="5">{{ comment.text }}</textarea>
+    </div>
+    <button class="nhsuk-button" type="submit">Save changes</button>
+    <a class="nhsuk-button nhsuk-button--secondary" href="/wcag-failures/{{ slug }}">Cancel</a>
+  </form>
+{% endblock %}
