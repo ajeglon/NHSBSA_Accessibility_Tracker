@@ -12,6 +12,33 @@
         html: failure.details
       }) }}
     {% endif %}
+    <form method="POST" action="/wcag-failures/{{ slug }}/comment">
+      <div class="nhsuk-form-group">
+        <label class="nhsuk-label" for="WCAGFailureExample">
+          Can you provide an example fix?
+        </label>
+        <div class="nhsuk-hint" id="WCAGFailureExample-hint">
+          Please include details of how you fixed this failure, which service the fix was on and any other relevant information.
+        </div> 
+        <textarea class="nhsuk-textarea" id="WCAGFailureExample" name="WCAGFailureExample" rows="5" aria-describedby="WCAGFailureExample-hint"></textarea>
+      </div>
+      <button class="nhsuk-button" id="WCAGFailureExample-submit" data-module="nhsuk-button" type="submit">
+        Submit fix
+      </button>
+    </form>
+    {% if comments and comments.length > 0 %}
+      <h3>Submitted comments</h3>
+      <ul class="nhsuk-list">
+        {% for comment in comments %}
+          <li>
+            <div class="nhsuk-inset-text">
+              <p>{{ comment.text | escape }}</p>
+              <small>Submitted on {{ comment.date | shortDate }}</small>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
   {% else %}
     <p>No description available for this WCAG failure.</p>
   {% endif %}
