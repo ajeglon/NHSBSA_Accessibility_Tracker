@@ -7,3 +7,30 @@
 <script src="/js/chart-page.js"></script>
 
 <!-- Add any custom scripts -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var toggle = document.getElementById('nav-2025-toggle');
+  var submenu = document.getElementById('nav-2025-submenu');
+  if (toggle && submenu) {
+    toggle.addEventListener('click', function () {
+      var expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', !expanded);
+      submenu.hidden = expanded;
+    });
+  }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var toggle = document.getElementById('nav-2024-toggle');
+  var submenu = document.getElementById('nav-2024-submenu');
+  if (toggle && submenu) {
+    toggle.addEventListener('click', function () {
+      var expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', !expanded);
+      submenu.hidden = expanded;
+    });
+  }
+});
+</script>
