@@ -1,0 +1,39 @@
+{
+  "WCAG_A": {
+    "passed": [
+      "1.3.2 Meaningful Sequence",
+      "2.1.2 No Keyboard Trap"
+    ],
+    "failed": [
+      "1.1.1 Non-text Content",
+      "1.3.1 Info and Relationships",
+      "1.4.1 Use of Colour",
+      "2.1.1 Keyboard",
+      "2.4.2 Page Titled"
+    ]
+  },
+  "WCAG_AA": {
+    "passed": [
+      "1.4.3 Contrast (Minimum)",
+      "1.4.4 Resize Text"
+    ],
+    "failed": [
+      "1.3.4 Orientation",
+      "1.4.10 Reflow",
+      "1.4.12 Text Spacing",
+      "2.4.6 Headings and Labels",
+      "2.4.5 Multiple Ways"
+    ]
+  },
+  "WCAG_AAA": {
+    "passed": [
+      "2.1.3 Keyboard (No Exception)"
+    ],
+    "failed": [
+      "1.4.6 Contrast (Enhanced)",
+      "1.4.8 Visual Presentation",
+      "2.4.9 Link Purpose (Link Only)",
+      "3.3.6 Error Prevention (All)"
+    ]
+  }
+}
