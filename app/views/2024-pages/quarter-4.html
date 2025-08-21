@@ -1,4 +1,17 @@
 {% extends "content-layout.html" %}
+{% from 'button/macro.njk' import button %}
 {% set pageHeading = "Quarter 4, 2024" %}
+{% set year = "2024" %}
+{% set quarter = "4" %}
 {% block pageContent %}
+
+
+ <canvas id="WCAGFailuresChart" width="400" height="200" data-year="{{ year }}" data-quarter="{{ quarter }}"></canvas>
+  <br/>
+  <button class="nhsuk-button" id="toggle-failures-btn" type="button">
+  Show all failures
+  </button>
+  <br/>
+  <div id="wcag-failures-table"></div>
+  
 {% endblock %}
